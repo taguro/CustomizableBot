@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Drawing;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections.Generic;
 
 namespace CustomizableBot
 {
@@ -13,19 +14,20 @@ namespace CustomizableBot
         System.Threading.Timer timer;
         protected ControlForm form;
 
+        List<int[]> inputPoints = new List<int[]>();
         //Botのパラメータ保存用のクラス
         [Serializable]class BotData
         {
             public InputRange inputRange;
+            public List<int[]> inputPoints;
             //...etc
-            public BotData(InputRange inputRange)
+            public BotData(InputRange inputRange, List<int[]> inputPoints)
             {
                 this.inputRange = inputRange;
+                this.inputPoints = inputPoints;
             }
         }
-        protected Bot()
-        {
-        }
+        protected Bot(){}
         public Bot(ControlForm form)
         {
             this.form = form;
@@ -51,6 +53,9 @@ namespace CustomizableBot
                 //情報の取得
                 //Point poi=UIControl.getCursorPos();//カーソル位置
                 Bitmap bmp = getInput();//選択した画面
+                List<Color> data = getInputPointsColor();//選択したn番目の点の色 data[n]
+                var brightness = getInputPointsBrightness();//選択したn番目の点の明るさ(HSB)
+                //var pos = inputPoints;//選択したn番目の点の位置 x:inputPoints[n][0], y:inputPoints[n][1]
 
 
                 //アクティブな画面への入力
@@ -86,6 +91,35 @@ namespace CustomizableBot
             return bmp;
         }
 
+        private List<Color> getInputPointsColor()
+        {
+            Bitmap bmp;
+            bmp = UIControl.captureScreen();
+           
+            List<Color> col = new List<Color>();
+            foreach(var pos in inputPoints)
+            {
+                col.Add(bmp.GetPixel(pos[0],pos[1]));
+            }
+            bmp.Dispose();
+            
+            return col;
+        }
+
+        private List<float> getInputPointsBrightness()
+        {
+            Bitmap bmp;
+            bmp = UIControl.captureScreen();
+
+            List<float> col = new List<float>();
+            foreach (var pos in inputPoints)
+            {
+                col.Add(bmp.GetPixel(pos[0], pos[1]).GetBrightness());
+            }
+            bmp.Dispose();
+
+            return col;
+        }
 
         #region botへの入力範囲の設定
         InputRange inputRange;
@@ -109,7 +143,19 @@ namespace CustomizableBot
 
         internal void setTrimRange(int left, int up, int right, int down)
         {
-            inputRange = new InputRange(left,up,right,down);
+            inputRange = new InputRange(left, up, right, down);
+            for (int y = inputRange.up; y < inputRange.down; y+=30)
+            {
+                for (int x = inputRange.left; x < inputRange.right; x+=30)
+                {
+                    inputPoints.Add(new int[] {x,y});
+                }
+            }
+            showInputRange();
+        }
+
+        private void showInputRange()
+        {
             Bitmap bmp = UIControl.captureScreen();
 
 
@@ -118,44 +164,57 @@ namespace CustomizableBot
             System.Drawing.Imaging.ImageAttributes ia =
                 new System.Drawing.Imaging.ImageAttributes();
             ia.SetGamma((float)0.3);
-            g.DrawImage(bmp,
+            if (inputRange.left == inputRange.right && inputRange.up == inputRange.down)
+            {
+                g.DrawImage(bmp, new Point(0, 0));
+            }
+            else
+            {
+                g.DrawImage(bmp,
                 new Rectangle(0, 0, bmp.Width, bmp.Height),
                 0, 0, bmp.Width, bmp.Height, GraphicsUnit.Pixel, ia);
-            g.Dispose();
+            }
 
-            for (int y = up;y< down;y++)
+
+            for (int y = inputRange.up; y < inputRange.down; y++)
             {
-                for (int x=left;x< right;x++)
+                for (int x = inputRange.left; x < inputRange.right; x++)
                 {
-                    newBmp.SetPixel(x, y, bmp.GetPixel(x,y));
+                    newBmp.SetPixel(x, y, bmp.GetPixel(x, y));
                 }
             }
+            foreach (var pos in inputPoints)
+            {
+                g.FillEllipse(Brushes.Blue, new Rectangle(pos[0] - 10, pos[1] - 10, 20, 20));
+            }
+            g.Dispose();
 
             form.logWithDispose(newBmp);
             bmp.Dispose();
         }
 
-        internal void saveInputRange()
+        #endregion
+
+        #region botへの入力点の設定
+        public void addInputPoints(int x,int y)
         {
-            if (inputRange.left == inputRange.right || inputRange.up == inputRange.down) return;
-            FileControl.save(inputRange);
-        }
-        internal void loadInputRange()
-        {
-            Object obj = FileControl.load();
-            if (obj == null) return;
-            inputRange = (InputRange)obj;
+            inputPoints.Add(new int[] {x,y});
 
             //描画
-            var bmp = getInput();
-            form.logWithDispose(bmp);
+            showInputRange();
         }
+        internal void deleteInputPoints()
+        {
+            inputPoints = new List<int[]>();
 
+            //描画
+            showInputRange();
+        }
         #endregion
 
         internal void save()
         {
-            BotData data = new BotData(inputRange);
+            BotData data = new BotData(inputRange,inputPoints);
             FileControl.save(data);
         }
 
@@ -163,8 +222,10 @@ namespace CustomizableBot
         {
             Object obj = FileControl.load();
             if (obj == null) return;
-            var loadbotData = (BotData)obj;
-            this.inputRange = loadbotData.inputRange;
+            var loadBotData = (BotData)obj;
+            this.inputRange = loadBotData.inputRange;
+            this.inputPoints = loadBotData.inputPoints;
+            showInputRange();
         }
     }
 

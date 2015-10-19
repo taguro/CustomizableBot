@@ -33,10 +33,9 @@
             this.listBox_log = new System.Windows.Forms.ListBox();
             this.button_restart = new System.Windows.Forms.Button();
             this.pictureBox_screen = new System.Windows.Forms.PictureBox();
-            this.button_save = new System.Windows.Forms.Button();
-            this.button_load = new System.Windows.Forms.Button();
             this.button_save_bot = new System.Windows.Forms.Button();
             this.button_load_bot = new System.Windows.Forms.Button();
+            this.button_delete = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_screen)).BeginInit();
             this.SuspendLayout();
             // 
@@ -90,32 +89,13 @@
             this.pictureBox_screen.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox_screen.TabIndex = 4;
             this.pictureBox_screen.TabStop = false;
+            this.pictureBox_screen.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_screen_Click);
             this.pictureBox_screen.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_screen_MouseDown);
             this.pictureBox_screen.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_screen_MouseUp);
             // 
-            // button_save
-            // 
-            this.button_save.Location = new System.Drawing.Point(312, 99);
-            this.button_save.Name = "button_save";
-            this.button_save.Size = new System.Drawing.Size(94, 23);
-            this.button_save.TabIndex = 5;
-            this.button_save.Text = "選択範囲を保存";
-            this.button_save.UseVisualStyleBackColor = true;
-            this.button_save.Click += new System.EventHandler(this.button_save_Click);
-            // 
-            // button_load
-            // 
-            this.button_load.Location = new System.Drawing.Point(312, 128);
-            this.button_load.Name = "button_load";
-            this.button_load.Size = new System.Drawing.Size(94, 23);
-            this.button_load.TabIndex = 6;
-            this.button_load.Text = "選択範囲を読込";
-            this.button_load.UseVisualStyleBackColor = true;
-            this.button_load.Click += new System.EventHandler(this.button_load_Click);
-            // 
             // button_save_bot
             // 
-            this.button_save_bot.Location = new System.Drawing.Point(312, 157);
+            this.button_save_bot.Location = new System.Drawing.Point(312, 99);
             this.button_save_bot.Name = "button_save_bot";
             this.button_save_bot.Size = new System.Drawing.Size(94, 23);
             this.button_save_bot.TabIndex = 7;
@@ -125,7 +105,7 @@
             // 
             // button_load_bot
             // 
-            this.button_load_bot.Location = new System.Drawing.Point(312, 186);
+            this.button_load_bot.Location = new System.Drawing.Point(312, 128);
             this.button_load_bot.Name = "button_load_bot";
             this.button_load_bot.Size = new System.Drawing.Size(94, 23);
             this.button_load_bot.TabIndex = 8;
@@ -133,15 +113,24 @@
             this.button_load_bot.UseVisualStyleBackColor = true;
             this.button_load_bot.Click += new System.EventHandler(this.button_load_bot_Click);
             // 
+            // button_delete
+            // 
+            this.button_delete.Location = new System.Drawing.Point(312, 157);
+            this.button_delete.Name = "button_delete";
+            this.button_delete.Size = new System.Drawing.Size(94, 23);
+            this.button_delete.TabIndex = 9;
+            this.button_delete.Text = "入力点を消去";
+            this.button_delete.UseVisualStyleBackColor = true;
+            this.button_delete.Click += new System.EventHandler(this.button_delete_Click);
+            // 
             // ControlForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(418, 350);
+            this.Controls.Add(this.button_delete);
             this.Controls.Add(this.button_load_bot);
             this.Controls.Add(this.button_save_bot);
-            this.Controls.Add(this.button_load);
-            this.Controls.Add(this.button_save);
             this.Controls.Add(this.pictureBox_screen);
             this.Controls.Add(this.button_restart);
             this.Controls.Add(this.listBox_log);
@@ -161,10 +150,9 @@
         private System.Windows.Forms.ListBox listBox_log;
         private System.Windows.Forms.Button button_restart;
         private System.Windows.Forms.PictureBox pictureBox_screen;
-        private System.Windows.Forms.Button button_save;
-        private System.Windows.Forms.Button button_load;
         private System.Windows.Forms.Button button_save_bot;
         private System.Windows.Forms.Button button_load_bot;
+        private System.Windows.Forms.Button button_delete;
     }
 }
 

@@ -95,6 +95,8 @@ namespace CustomizableBot
         private void pictureBox_screen_MouseUp(object sender, MouseEventArgs e)
         {
             end = e;
+
+            if (start.X == end.X || start.Y == end.Y) return;//ドラッグして範囲指定していない場合は何も実行しない
             using (Bitmap src = UIControl.captureScreen())
             {
                 pictureBox_screen.Height = pictureBox_screen.Height;
@@ -124,19 +126,23 @@ namespace CustomizableBot
                 }
 
                 bot.setTrimRange(left, up, right, down);
-                log("left=" + left + ", up=" + up + ", right=" + right + ", down=" + down);
+                log("select left=" + left + ", up=" + up + ", right=" + right + ", down=" + down);
             }
         }
         #endregion
-
-        private void button_save_Click(object sender, EventArgs e)
+        private void pictureBox_screen_Click(object sender, MouseEventArgs e)
         {
-            bot.saveInputRange();
-        }
+            if (start.X != e.X && start.Y != e.Y) return;//ドラッグして範囲指定している場合は何も実行しない
+            using (Bitmap src = UIControl.captureScreen())
+            {
+                pictureBox_screen.Height = pictureBox_screen.Height;
+                pictureBox_screen.Width = pictureBox_screen.Height * src.Width / src.Height;
 
-        private void button_load_Click(object sender, EventArgs e)
-        {
-            bot.loadInputRange();
+                int x = src.Width * e.X / pictureBox_screen.Width;
+                int y = src.Height * e.Y / pictureBox_screen.Height;
+                bot.addInputPoints(x,y);
+                log("click x:"+x+", y:"+y);
+            }
         }
 
         private void button_save_bot_Click(object sender, EventArgs e)
@@ -147,6 +153,11 @@ namespace CustomizableBot
         private void button_load_bot_Click(object sender, EventArgs e)
         {
             bot.load();
+        }
+
+        private void button_delete_Click(object sender, EventArgs e)
+        {
+            bot.deleteInputPoints();
         }
     }
 }
