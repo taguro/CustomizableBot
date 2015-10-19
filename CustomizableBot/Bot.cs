@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace CustomizableBot
 {
@@ -55,19 +56,28 @@ namespace CustomizableBot
                 Bitmap bmp = getInput();//選択した画面
                 List<Color> data = getInputPointsColor();//選択したn番目の点の色 data[n]
                 var brightness = getInputPointsBrightness();//選択したn番目の点の明るさ(HSB)
-                //var pos = inputPoints;//選択したn番目の点の位置 x:inputPoints[n][0], y:inputPoints[n][1]
+                                                            //var pos = inputPoints;//選択したn番目の点の位置 x:inputPoints[n][0], y:inputPoints[n][1]
 
 
                 //アクティブな画面への入力
                 //UIControl.sendKeys("{UP}");
                 //UIControl.SetCursorPos(0,0);
-                UIControl.click();
+                //UIControl.click();
+                //UIControl.keyDown(0x50, 10);//{P}を10回入力
+                //UIControl.keyDown(0x28, 10); //{↓}を押下
+                //UIControl.keyUp(0x28,10);
+                //UIControl.keyDown(0x26, 10); //{↑}を押下
+                Thread thread = new Thread(() =>
+                {
+                    UIControl.keyPress(0x28, 10);//↓を10回入力
+                });
+                thread.Start();
 
                 //ログの出力方法
                 form.logWithDispose(bmp);//画像の表示
                 form.log(sw.Elapsed+"");//文字列の表示
 
-            }, null, 0, 1000);
+            }, null, 0, 400);
         }
 
         internal void stop()
@@ -319,6 +329,115 @@ namespace CustomizableBot
         internal static void sendKeys(String key)
         {
             SendKeys.SendWait(key);
+        }
+
+        [DllImport("user32.dll")]
+        private extern static void SendInput(
+int nInputs, ref INPUT pInputs, int cbsize);
+
+        [StructLayout(LayoutKind.Explicit)]
+        private struct INPUT
+        {
+            [FieldOffset(0)]
+            public int type;
+            [FieldOffset(4)]
+            public MOUSEINPUT mi;
+            [FieldOffset(4)]
+            public KEYBDINPUT ki;
+            [FieldOffset(4)]
+            public HARDWAREINPUT hi;
+        };
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MOUSEINPUT
+        {
+            public int dx;
+            public int dy;
+            public int mouseData;
+            public int dwFlags;
+            public int time;
+            public int dwExtraInfo;
+        };
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct KEYBDINPUT
+        {
+            public short wVk;
+            public short wScan;
+            public int dwFlags;
+            public int time;
+            public int dwExtraInfo;
+        };
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct HARDWAREINPUT
+        {
+            public int uMsg;
+            public short wParamL;
+            public short wParamH;
+        };
+        private const int INPUT_MOUSE = 0;
+        private const int INPUT_KEYBOARD = 1;
+        private const int INPUT_HARDWARE = 2;
+        private const int KEYEVENTF_KEYDOWN = 0x0;
+        private const int KEYEVENTF_EXTENDEDKEY = 0x1;
+        private const int KEYEVENTF_KEYUP = 0x2;
+
+        [DllImport("user32.dll", EntryPoint = "MapVirtualKeyA")]
+        private extern static int MapVirtualKey(
+        int wCode, int wMapType);
+        internal static void keyDown(short i,int num)
+        {
+            INPUT[] input = new INPUT[num];
+            for (int n = 0; n < num; n++)
+            {
+                input[n].type = INPUT_KEYBOARD;
+                input[n].ki.wVk = i;
+                input[n].ki.wScan = (short)MapVirtualKey(input[0].ki.wVk, 0);
+                input[n].ki.dwFlags = KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYDOWN;
+                input[n].ki.dwExtraInfo = 0;
+                input[n].ki.time = 0;
+            }
+
+            SendInput(num, ref input[0], Marshal.SizeOf(input[0]));
+        }
+        internal static void keyUp(short i, int num)
+        {
+            INPUT[] input = new INPUT[num];
+            for (int n = 0; n < num; n++)
+            {
+                input[n].type = INPUT_KEYBOARD;
+                input[n].ki.wVk = i;
+                input[n].ki.wScan = (short)MapVirtualKey(input[0].ki.wVk, 0);
+                input[n].ki.dwFlags = KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP;
+                input[n].ki.dwExtraInfo = 0;
+                input[n].ki.time = 0;
+            }
+
+            SendInput(num, ref input[0], Marshal.SizeOf(input[0]));
+        }
+
+        internal static void keyPress(short i, int num)
+        {
+            INPUT[] input = new INPUT[num*2];
+            for (int n = 0; n < num*2; n=n+2)
+            {
+                input[n].type = INPUT_KEYBOARD;
+                input[n].ki.wVk = i;
+                input[n].ki.wScan = (short)MapVirtualKey(input[0].ki.wVk, 0);
+                input[n].ki.dwFlags = KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYDOWN;
+                input[n].ki.dwExtraInfo = 0;
+                input[n].ki.time = 0;
+
+                input[n+1].type = INPUT_KEYBOARD;
+                input[n+1].ki.wVk = i;
+                input[n+1].ki.wScan = (short)MapVirtualKey(input[0].ki.wVk, 0);
+                input[n+1].ki.dwFlags = KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP;
+                input[n+1].ki.dwExtraInfo = 0;
+                input[n+1].ki.time = 0;
+            }
+
+            SendInput(num*2, ref input[0], Marshal.SizeOf(input[0]));
         }
         #endregion
         #region マウス入力

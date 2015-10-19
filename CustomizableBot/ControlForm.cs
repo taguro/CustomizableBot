@@ -54,12 +54,16 @@ namespace CustomizableBot
             // If these threads are different, it returns true.
             if (this.listBox_log.InvokeRequired)
             {
-                Action act = new Action(() => { this.listBox_log.Items.Add(str); });
+                Action act = new Action(() => {
+                    this.listBox_log.Items.Add(str);
+                    if (this.listBox_log.Items.Count > 500) this.listBox_log.Items.RemoveAt(0);
+                });
                 this.Invoke(act , new object[] {  });
             }
             else
             {
                 this.listBox_log.Items.Add(str);
+                if (this.listBox_log.Items.Count > 500) this.listBox_log.Items.RemoveAt(0);
             }
         }
         internal void logWithDispose(Bitmap bmp)
