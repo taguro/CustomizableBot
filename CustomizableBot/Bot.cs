@@ -123,7 +123,8 @@ namespace CustomizableBot
 
         #region botへの入力範囲の設定
         InputRange inputRange;
- 
+
+        internal int inputGranularity=30;
         [Serializable]
         public struct InputRange
         {
@@ -144,9 +145,9 @@ namespace CustomizableBot
         internal void setTrimRange(int left, int up, int right, int down)
         {
             inputRange = new InputRange(left, up, right, down);
-            for (int y = inputRange.up; y < inputRange.down; y+=30)
+            for (int y = inputRange.up; y < inputRange.down; y+= inputGranularity)
             {
-                for (int x = inputRange.left; x < inputRange.right; x+=30)
+                for (int x = inputRange.left; x < inputRange.right; x+= inputGranularity)
                 {
                     inputPoints.Add(new int[] {x,y});
                 }
@@ -185,7 +186,7 @@ namespace CustomizableBot
             }
             foreach (var pos in inputPoints)
             {
-                g.FillEllipse(Brushes.Blue, new Rectangle(pos[0] - 10, pos[1] - 10, 20, 20));
+                g.FillEllipse(Brushes.Blue, new Rectangle(pos[0] - 8, pos[1] - 8, 16, 16));
             }
             g.Dispose();
 

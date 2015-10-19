@@ -159,5 +159,17 @@ namespace CustomizableBot
         {
             bot.deleteInputPoints();
         }
+
+        private void textBox_granularity_TextChanged(object sender, EventArgs e)
+        {
+            try {
+                int gran = int.Parse(textBox_granularity.Text);
+                if (gran <= 0) throw new FormatException();
+                bot.inputGranularity = gran;
+            }catch(FormatException exception)
+            {
+                log("1以上の整数のみ入力可能");
+            }
+        }
     }
 }

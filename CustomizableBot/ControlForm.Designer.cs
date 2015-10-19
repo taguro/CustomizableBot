@@ -36,6 +36,8 @@
             this.button_save_bot = new System.Windows.Forms.Button();
             this.button_load_bot = new System.Windows.Forms.Button();
             this.button_delete = new System.Windows.Forms.Button();
+            this.textBox_granularity = new System.Windows.Forms.TextBox();
+            this.label_granularity = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_screen)).BeginInit();
             this.SuspendLayout();
             // 
@@ -123,11 +125,31 @@
             this.button_delete.UseVisualStyleBackColor = true;
             this.button_delete.Click += new System.EventHandler(this.button_delete_Click);
             // 
+            // textBox_granularity
+            // 
+            this.textBox_granularity.Location = new System.Drawing.Point(377, 202);
+            this.textBox_granularity.Name = "textBox_granularity";
+            this.textBox_granularity.Size = new System.Drawing.Size(29, 19);
+            this.textBox_granularity.TabIndex = 10;
+            this.textBox_granularity.Text = "10";
+            this.textBox_granularity.TextChanged += new System.EventHandler(this.textBox_granularity_TextChanged);
+            // 
+            // label_granularity
+            // 
+            this.label_granularity.AutoSize = true;
+            this.label_granularity.Location = new System.Drawing.Point(321, 187);
+            this.label_granularity.Name = "label_granularity";
+            this.label_granularity.Size = new System.Drawing.Size(75, 12);
+            this.label_granularity.TabIndex = 11;
+            this.label_granularity.Text = "入力点の間隔";
+            // 
             // ControlForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(418, 350);
+            this.Controls.Add(this.label_granularity);
+            this.Controls.Add(this.textBox_granularity);
             this.Controls.Add(this.button_delete);
             this.Controls.Add(this.button_load_bot);
             this.Controls.Add(this.button_save_bot);
@@ -140,6 +162,7 @@
             this.Text = "ControlForm";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_screen)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -153,6 +176,8 @@
         private System.Windows.Forms.Button button_save_bot;
         private System.Windows.Forms.Button button_load_bot;
         private System.Windows.Forms.Button button_delete;
+        private System.Windows.Forms.TextBox textBox_granularity;
+        private System.Windows.Forms.Label label_granularity;
     }
 }
 
